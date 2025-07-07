@@ -1,0 +1,51 @@
+Prerequisites:
+C/C++ (Microsoft)
+
+CMake Tools (Microsoft)
+
+/-------------------MinGW-----------------/
+Install MinGW:https://sourceforge.net/projects/mingw/files/latest/download
+
+Add to System PATH:
+
+Press Win + R → type sysdm.cpl → Advanced → Environment Variables
+
+Under System variables, edit Path → New
+
+Add: C:\mingw64\bin
+
+Click OK on all dialogs
+
+Mark the packages from the picture
+
+Installation -> Apply changes -> Apply
+Restart VSCode 
+
+Check if everything is installed correctly with: 
+gcc --version
+/-----------------------------------------/
+
+
+
+/-------------------CMAKE--------------------/
+
+Download:https://github.com/Kitware/CMake/releases/download/v4.1.0-rc1/cmake-4.1.0-rc1-windows-x86_64.msi
+
+Restart VSCode 
+
+Check if everything is installed correctly with: 
+cmake --version
+
+/--------------------------------------------/
+
+
+
+/----------------------FreeRTOS Set Up---------------------------/
+Step 1:
+git clone https://github.com/FreeRTOS/FreeRTOS.git
+
+Step 2:
+msbuild FreeRTOS.sln /p:Configuration=Debug
+
+problem 1 (will add the pic later) - go to -> C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin
+
