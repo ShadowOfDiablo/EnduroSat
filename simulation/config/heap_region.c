@@ -14,7 +14,6 @@ void vPortDefineHeapRegions(void) {
     vPortDefineHeapRegions(xHeapRegions);
 }
 
-// Implement heap functions
 size_t xPortGetFreeHeapSize(void) {
     return xPortGetFreeHeapSize();
 }

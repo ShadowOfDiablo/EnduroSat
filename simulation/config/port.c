@@ -5,12 +5,13 @@
 #include <stdio.h>
 
 static UBaseType_t uxCriticalNesting = 0;
+static CRITICAL_SECTION xCriticalSection;
 static HANDLE hTimerThread = NULL;
 
 #if ( configAPPLICATION_ALLOCATED_HEAP == 1 )
-    uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+    __attribute__((aligned(8))) uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
 #else
-    static uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
+    static __attribute__((aligned(8))) uint8_t ucHeap[ configTOTAL_HEAP_SIZE ];
 #endif
 
 void vPortYield(void) {
@@ -18,34 +19,65 @@ void vPortYield(void) {
 }
 
 void vPortEnterCritical(void) {
+    if (xCriticalSection.DebugInfo == NULL) {
+        // Critical section not initialized yet
+        return;
+    }
+    EnterCriticalSection(&xCriticalSection);
     uxCriticalNesting++;
 }
 
 void vPortExitCritical(void) {
-    if (uxCriticalNesting > 0) {
-        uxCriticalNesting--;
+    if (xCriticalSection.DebugInfo == NULL) {
+        // Critical section not initialized yet
+        return;
+    }
+    uxCriticalNesting--;
+    if (uxCriticalNesting == 0) {
+        LeaveCriticalSection(&xCriticalSection);
     }
 }
 
+void vPortInitializeCriticalSection(void) {
+    InitializeCriticalSection(&xCriticalSection);
+}
+
 StackType_t *pxPortInitialiseStack(StackType_t *pxTopOfStack, TaskFunction_t pxCode, void *pvParameters) {
+    pxTopOfStack--;
+    
+    *pxTopOfStack = (StackType_t)pxCode;        // Instruction pointer
+    pxTopOfStack--;
+    *pxTopOfStack = 0;                          // Flags register
+    pxTopOfStack--;
+    *pxTopOfStack = (StackType_t)pvParameters;   // Parameter
+    pxTopOfStack--;
+    
+    // Simulate saved registers
+    for(int i = 0; i < 15; i++) {
+        *pxTopOfStack = 0;
+        pxTopOfStack--;
+    }
+    
     return pxTopOfStack;
 }
 
-// Create a simulated tick thread
 static DWORD WINAPI prvTimerThread(LPVOID lpParam) {
     const DWORD xDelay = 1000 / configTICK_RATE_HZ;
+    TickType_t xLastTick = xTaskGetTickCount();
     
     for (;;) {
         Sleep(xDelay);
         if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-            xTaskIncrementTick();
+            // Proper tick increment method
+            if (xTaskIncrementTick() != pdFALSE) {
+                portYIELD();
+            }
         }
     }
     return 0;
 }
 
 BaseType_t xPortStartScheduler(void) {
-    // Create the tick thread
     hTimerThread = CreateThread(NULL, 0, prvTimerThread, NULL, 0, NULL);
     if (hTimerThread == NULL) {
         return pdFALSE;
@@ -53,8 +85,10 @@ BaseType_t xPortStartScheduler(void) {
 
     SetThreadPriority(hTimerThread, THREAD_PRIORITY_HIGHEST);
 
+    // Start the scheduler - this should never return
     vTaskStartScheduler();
 
+    // Only reach here if scheduler failed
     return pdFALSE;
 }
 

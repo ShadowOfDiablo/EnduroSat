@@ -37,21 +37,37 @@ static void internal_slave_task(void *pvParameters) {
 }
 
 int main() {
+    extern void vPortInitializeCriticalSection(void);
+    vPortInitializeCriticalSection();  // Initialize critical section first
+    
+    extern uint8_t ucHeap[configTOTAL_HEAP_SIZE];
+    BaseType_t status;
+    printf("Heap starts at %p, size: %zu bytes\n", ucHeap, sizeof(ucHeap));
     setvbuf(stdout, NULL, _IONBF, 0);
     printf("Starting FreeRTOS Windows port...\n");
     
-    // Create tasks dynamically
-    xTaskCreate(internal_master_task, "Master", 4096, NULL, 
-                configMAX_PRIORITIES-1, NULL);
-    printf("Master task created\n");
+    status = xTaskCreate(internal_master_task, "Master", 4096, NULL, configMAX_PRIORITIES-1, NULL);
+        if (status != pdPASS) {
+            printf("ERROR: Failed to create Master task! (%d)\n", status);
+        } else {
+            printf("Master task created\n");
+        }
     
-    xTaskCreate(internal_slave_task, "Slave", 4096, NULL, 
-                configMAX_PRIORITIES-2, NULL);
-    printf("Slave task created\n");
+    status = xTaskCreate(internal_slave_task, "Slave", 4096, NULL, configMAX_PRIORITIES-2, NULL);
+        if (status != pdPASS) {
+            printf("ERROR: Failed to create Slave task! (%d)\n", status);
+        } else {
+            printf("Slave task created\n");
+        }
     
     printf("Free heap before scheduler: %lu bytes\n", xPortGetFreeHeapSize());
-    printf("Starting FreeRTOS scheduler...\n");
+
+    #ifdef _WIN32
+        Sleep(100);
+    #endif
     
+    printf("Starting FreeRTOS scheduler...\n");
+
     vTaskStartScheduler();
     
     printf("ERROR: Scheduler exited!\n");
