@@ -4,20 +4,22 @@
 #include "task.h"
 #include "fake_assert.h"
 
-void vFakeAssert(bool x, char* file, int line) {
+void vFakeAssert(bool x, char* file, int line)
+{
     (void)x;
     printf("Assertion failed at %s:%d\n", file, line);
     exit(1);
 }
 
-void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName) {
+void vApplicationStackOverflowHook(TaskHandle_t xTask, char *pcTaskName)
+{
     (void)xTask;
     printf("Stack overflow in task: %s\n", pcTaskName);
     exit(1);
 }
 
 void vApplicationMallocFailedHook(void) {
-    printf("Memory allocation failed!\n");
+    printf("Memory allocation failed! Free heap: %zu bytes\n", xPortGetFreeHeapSize());
     exit(1);
 }
 
@@ -43,23 +45,29 @@ void vApplicationGetTimerTaskMemory(StaticTask_t **ppxTimerTaskTCBBuffer,
     *pulTimerTaskStackSize = configTIMER_TASK_STACK_DEPTH;
 }
 
-void vConfigureTimerForRunTimeStats(void) {
+void vConfigureTimerForRunTimeStats(void)
+{
 
 }
 
-void portRECORD_READY_PRIORITY(UBaseType_t uxPriority, UBaseType_t uxReadyPriorities) {
+void portRECORD_READY_PRIORITY(UBaseType_t uxPriority, UBaseType_t uxReadyPriorities)
+{
     // Dummy implementation
 }
 
-void portRESET_READY_PRIORITY(UBaseType_t uxPriority, UBaseType_t uxReadyPriorities) {
+void portRESET_READY_PRIORITY(UBaseType_t uxPriority, UBaseType_t uxReadyPriorities)
+{
     // Dummy implementation
 }
 
-UBaseType_t portGET_HIGHEST_PRIORITY(UBaseType_t uxTopPriority, UBaseType_t uxReadyPriorities) {
+UBaseType_t portGET_HIGHEST_PRIORITY(UBaseType_t uxTopPriority, UBaseType_t uxReadyPriorities)
+{
     return 0; // Dummy implementation
 }
 
-// Other hooks
+void vApplicationIdleHook(void) {
+    printf("Idle hook\n");
+}
+
 void vApplicationTickHook(void) {}
-void vApplicationIdleHook(void) {}
 void vApplicationDaemonTaskStartupHook(void) {}

@@ -21,15 +21,19 @@ void vPortExitCritical(void) {
     }
 }
 
-void vPortGenerateSimulatedInterrupt(uint32_t ulInterruptNumber) {
+void vPortGenerateSimulatedInterrupt(uint32_t ulInterruptNumber)
+{
 }
 
-void vPortCloseRunningThread(void *pvTaskToDelete, volatile BaseType_t *pxPendYield) {
+void vPortCloseRunningThread(void *pvTaskToDelete, volatile BaseType_t *pxPendYield)
+{
 }
 
-void vPortDeleteThread(void *pvTaskToDelete) {
+void vPortDeleteThread(void *pvTaskToDelete)
+{
 }
 
-BaseType_t xPortStartScheduler(void) {
+BaseType_t xPortStartScheduler(void)
+{
     return pdTRUE;
 }

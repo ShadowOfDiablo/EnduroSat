@@ -1,21 +1,32 @@
-#include "portmacro.h"
 #include "FreeRTOS.h"
 #include "task.h"
 #include <stdio.h>
 #include "device2.h"
 
-void device2_task(void *pvParameters) {
-    while(1) {
-        printf("Device2 running\n");
-        vTaskDelay(pdMS_TO_TICKS(1000));
-    }
-}
+// static void internal_slave_task(void *pvParameters);
 
-int main() {
-    printf("Device2 starting...\n");
+// void device2_init(void) {
+//     printf("Creating Slave task...\n");
+//     // Create slave task at medium priority
+//     BaseType_t status = xTaskCreate(
+//         internal_slave_task,
+//         "Slave",
+//         2048,  // Reduced stack size
+//         NULL,
+//         configMAX_PRIORITIES - 2,
+//         NULL
+//     );
     
-    xTaskCreate(device2_task, "Main", configMINIMAL_STACK_SIZE, NULL, 1, NULL);
-    
-    vTaskStartScheduler();
-    return 0;
-}
+//     if (status != pdPASS) {
+//         printf("ERROR: Failed to create Slave task!\n");
+//     }
+// }
+
+// static void internal_slave_task(void *pvParameters) {
+//     (void)pvParameters;
+//     while(1) {
+//         printf("Slave device operating\n");
+//         fflush(stdout);
+//         vTaskDelay(pdMS_TO_TICKS(1500));
+//     }
+// }
