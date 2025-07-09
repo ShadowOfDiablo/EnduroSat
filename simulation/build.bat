@@ -44,3 +44,5 @@ if !errorlevel! neq 0 (
 
 echo Build successful!
 endlocal
+
+start .\ device_system.exe

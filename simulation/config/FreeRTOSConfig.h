@@ -1,19 +1,21 @@
 #ifndef FREERTOS_CONFIG_H
 #define FREERTOS_CONFIG_H
-/* Modified version of Amazon's config */
+
 /* Essential configuration */
 #define configUSE_16_BIT_TICKS          0
 #define configUSE_PREEMPTION            1
-#define configUSE_IDLE_HOOK             0
-#define configUSE_TICK_HOOK             0
-#define configTICK_RATE_HZ              1000
+#define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES            5
-#define configTOTAL_HEAP_SIZE           (size_t)(36*1024)
+#define configTOTAL_HEAP_SIZE           ((size_t)(2048 * 1024)) //2mb
 #define configMAX_TASK_NAME_LEN         16
+#define configMINIMAL_STACK_SIZE        ( ( uint16_t ) 4096 )
+#define configTIMER_TASK_STACK_DEPTH    2048
+#define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 )
+#define configBYTE_ALIGNMENT            8
 
 /* Memory allocation */
 #define configSUPPORT_DYNAMIC_ALLOCATION 1
-#define configSUPPORT_STATIC_ALLOCATION  0
+#define configSUPPORT_STATIC_ALLOCATION  1
 
 /* Optional configuration */
 #define configUSE_TRACE_FACILITY        0
@@ -21,25 +23,40 @@
 #define configENABLE_BACKWARD_COMPATIBILITY 0
 #define configUSE_TASK_NOTIFICATIONS    1
 #define configUSE_TIMERS                1
-#define configTIMER_TASK_PRIORITY       (configMAX_PRIORITIES-1)
+#define configIDLE_SHOULD_YIELD         1
+#define configTIMER_TASK_PRIORITY       ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH        10
-#define configTIMER_TASK_STACK_DEPTH    configMINIMAL_STACK_SIZE
+#define configAPPLICATION_ALLOCATED_HEAP 1
+#define configUSE_MUTEXES 1
+#define configUSE_COUNTING_SEMAPHORES 1
+#define configUSE_QUEUE_SETS 1
 
-/* Hardware specifics */
-#define configCPU_CLOCK_HZ              (unsigned long)100000000
-#define configMINIMAL_STACK_SIZE        ((uint16_t)768)  // Increased to 768
+/* Task utilities */
+#define INCLUDE_vTaskDelay              1
+#define INCLUDE_vTaskDelete             1
+#define INCLUDE_vTaskSuspend            1
+#define INCLUDE_xTaskGetSchedulerState  1
+
+/* Output configuration */
+#define configUSE_STDIO                 1
+#define configPRINTF( x )               printf x
 
 /* Error checking */
-#include "fake_assert.h"  // Include for vFakeAssert declaration
-#define configASSERT(x) if((x) == 0) vFakeAssert(false, __FILE__, __LINE__)
+#include "fake_assert.h"
+#define configASSERT( x )               if( ( x ) == 0 ) vFakeAssert( false, __FILE__, __LINE__ )
 
-/* Stack overflow hook */
+/* Hooks */
 #define configCHECK_FOR_STACK_OVERFLOW  1
+#define configUSE_MALLOC_FAILED_HOOK    1
+
+/* Kernel features */
+#define configUSE_IDLE_HOOK             0
+#define configUSE_TICK_HOOK             0
+#define configUSE_DAEMON_TASK_STARTUP_HOOK 0
 
 /* Priority management */
 #define configUSE_PORT_OPTIMISED_TASK_SELECTION 0
 
-/* Needed for the original function*/
-#define INCLUDE_vTaskDelay             1
+
 
 #endif /* FREERTOS_CONFIG_H */

@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-/* Remove duplicate definition */
+/* Duplicate definition */
 #undef portSTACK_GROWTH
 
 #define portCHAR        char
@@ -18,13 +18,13 @@ typedef portSTACK_TYPE StackType_t;
 typedef long BaseType_t;
 typedef unsigned long UBaseType_t;
 
-void vPortEnterCritical(void);
-void vPortExitCritical(void);
+extern void vPortEnterCritical(void);
+extern void vPortExitCritical(void);
 #define portENTER_CRITICAL()  vPortEnterCritical()
 #define portEXIT_CRITICAL()   vPortExitCritical() 
 #define portDISABLE_INTERRUPTS() 
 #define portENABLE_INTERRUPTS()  
-#define portBYTE_ALIGNMENT 8
+#define portBYTE_ALIGNMENT configBYTE_ALIGNMENT
 
 /* Task utilities */
 void vPortYield(void);
@@ -46,4 +46,7 @@ void vPortYield(void);
 #define portTASK_FUNCTION_PROTO(vFunction, pvParameters) void vFunction(void *pvParameters)
 #define portTASK_FUNCTION(vFunction, pvParameters) void vFunction(void *pvParameters)
 
+void vPortInitializeCriticalSection(void);
+BaseType_t xPortStartScheduler( void );
+void vPortEndScheduler( void );
 #endif /* PORTMACRO_H */
