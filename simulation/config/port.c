@@ -19,7 +19,8 @@ void vPortYield(void) {
 }
 
 void vPortEnterCritical(void) {
-    if (xCriticalSection.DebugInfo == NULL) {
+    if (xCriticalSection.DebugInfo == NULL) 
+    {
         // Critical section not initialized yet
         return;
     }
@@ -28,7 +29,8 @@ void vPortEnterCritical(void) {
 }
 
 void vPortExitCritical(void) {
-    if (xCriticalSection.DebugInfo == NULL) {
+    if (xCriticalSection.DebugInfo == NULL)
+    {
         // Critical section not initialized yet
         return;
     }
@@ -67,8 +69,8 @@ static DWORD WINAPI prvTimerThread(LPVOID lpParam) {
     
     for (;;) {
         Sleep(xDelay);
-        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED) {
-            // Proper tick increment method
+        if (xTaskGetSchedulerState() != taskSCHEDULER_NOT_STARTED)
+        {
             if (xTaskIncrementTick() != pdFALSE) {
                 portYIELD();
             }
@@ -77,25 +79,32 @@ static DWORD WINAPI prvTimerThread(LPVOID lpParam) {
     return 0;
 }
 
-BaseType_t xPortStartScheduler(void) {
-    hTimerThread = CreateThread(NULL, 0, prvTimerThread, NULL, 0, NULL);
-    if (hTimerThread == NULL) {
-        return pdFALSE;
-    }
+BaseType_t xPortStartScheduler( void )
+{
+    /* 1) Spin up the FreeRTOS tick thread */
+    hTimerThread = CreateThread(
+        NULL,           /* no security */
+        0,              /* default stack */
+        prvTimerThread, /* thread fn */
+        NULL,           /* no parameter */
+        0,              /* run immediately */
+        NULL            /* no thread ID needed */
+    );
+    configASSERT( hTimerThread );
 
-    SetThreadPriority(hTimerThread, THREAD_PRIORITY_HIGHEST);
+    SetThreadPriority( hTimerThread, THREAD_PRIORITY_TIME_CRITICAL );
 
-    // Start the scheduler - this should never return
-    vTaskStartScheduler();
+    /* 2) Now *block* forever so the scheduler can run tasks */
+    WaitForSingleObject( hTimerThread, INFINITE );
 
-    // Only reach here if scheduler failed
+    /* 3) If someone calls vPortEndScheduler(), we’ll break out */
     return pdFALSE;
 }
-
-void vPortEndScheduler(void) {
-    if (hTimerThread) {
-        TerminateThread(hTimerThread, 0);
-        CloseHandle(hTimerThread);
+void vPortEndScheduler( void )
+{
+    if( hTimerThread != NULL )
+    {
+        TerminateThread( hTimerThread, 0 );
+        CloseHandle( hTimerThread );
     }
-    exit(0);
 }

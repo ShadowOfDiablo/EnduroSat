@@ -20,10 +20,8 @@ set(FREERTOS_SOURCES
     ${CMAKE_CURRENT_SOURCE_DIR}/../freeRTOS_OS/FreeRTOS/FreeRTOS/Source/stream_buffer.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../freeRTOS_OS/FreeRTOS/FreeRTOS/Source/tasks.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../freeRTOS_OS/FreeRTOS/FreeRTOS/Source/timers.c
-    # ${CMAKE_CURRENT_SOURCE_DIR}/../freeRTOS_OS/FreeRTOS/FreeRTOS/Source/portable/MemMang/heap_3.c
     ${CMAKE_CURRENT_SOURCE_DIR}/../freeRTOS_OS/FreeRTOS/FreeRTOS/Source/portable/MemMang/heap_4.c
     # Config files 
-    # ${CMAKE_CURRENT_SOURCE_DIR}/config/heap_region.c
     ${CMAKE_CURRENT_SOURCE_DIR}/config/port.c
     ${CMAKE_CURRENT_SOURCE_DIR}/config/stubs/hooks.c
 )

@@ -18,16 +18,19 @@
 
 extern size_t xPortGetFreeHeapSize(void);
 extern void *pvPortMalloc(size_t);
-static void internal_master_task(void *pvParameters) {
+static void internal_master_task(void *pvParameters) 
+{
     (void)pvParameters;
-    while(1) {
+    while(1) 
+    {
         printf("Master device operating\n");
         fflush(stdout);
         vTaskDelay(pdMS_TO_TICKS(1000));
     }
 }
 
-static void internal_slave_task(void *pvParameters) {
+static void internal_slave_task(void *pvParameters) 
+{
     (void)pvParameters;
     while(1) {
         printf("Slave device operating\n");
@@ -36,7 +39,8 @@ static void internal_slave_task(void *pvParameters) {
     }
 }
 
-int main() {
+int main() 
+{
     extern void vPortInitializeCriticalSection(void);
     vPortInitializeCriticalSection();  // Initialize critical section first
     
@@ -47,16 +51,22 @@ int main() {
     printf("Starting FreeRTOS Windows port...\n");
     
     status = xTaskCreate(internal_master_task, "Master", 4096, NULL, configMAX_PRIORITIES-1, NULL);
-        if (status != pdPASS) {
+        if (status != pdPASS) 
+        {
             printf("ERROR: Failed to create Master task! (%d)\n", status);
-        } else {
+        } 
+        else 
+        {
             printf("Master task created\n");
         }
     
     status = xTaskCreate(internal_slave_task, "Slave", 4096, NULL, configMAX_PRIORITIES-2, NULL);
-        if (status != pdPASS) {
+        if (status != pdPASS)
+        {
             printf("ERROR: Failed to create Slave task! (%d)\n", status);
-        } else {
+        } 
+        else 
+        {
             printf("Slave task created\n");
         }
     

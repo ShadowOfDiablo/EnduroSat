@@ -3,7 +3,7 @@
 
 #include <stdint.h>
 
-/* Remove duplicate definition */
+/* Duplicate definition */
 #undef portSTACK_GROWTH
 
 #define portCHAR        char
@@ -47,4 +47,6 @@ void vPortYield(void);
 #define portTASK_FUNCTION(vFunction, pvParameters) void vFunction(void *pvParameters)
 
 void vPortInitializeCriticalSection(void);
+BaseType_t xPortStartScheduler( void );
+void vPortEndScheduler( void );
 #endif /* PORTMACRO_H */
