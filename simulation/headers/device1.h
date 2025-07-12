@@ -1,10 +1,11 @@
-#ifndef ___DEVICE1_H___
-#define ___DEVICE1_H___
-
-#define DEVICE_ID   0x01
-#define MAX_SLAVES  1
+#ifndef DEVICE1_H
+#define DEVICE1_H
+typedef enum {
+    MASTER_IDLE,
+    MASTER_PROCESSING,
+    MASTER_ERROR
+} MasterState;
 
 void device1_init(void);
-void device1_main_task(void *pvParameters);
 
-#endif // ___DEVICE1_H___
+#endif // DEVICE1_H

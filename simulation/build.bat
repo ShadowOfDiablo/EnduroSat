@@ -18,7 +18,6 @@ if "!GENERATOR!"=="" (
     )
 )
 
-:: Error if no compilers found
 if "!GENERATOR!"=="" (
     echo ERROR: No compatible compiler found. Install either:
     echo   - Visual Studio 2022 with C++ tools
@@ -26,7 +25,6 @@ if "!GENERATOR!"=="" (
     exit /b 1
 )
 
-:: Configure step
 echo Generating build files with !GENERATOR!...
 cmake -S . -B build -G !GENERATOR! !CMAKE_ARCH!
 if !errorlevel! neq 0 (
@@ -34,7 +32,6 @@ if !errorlevel! neq 0 (
     exit /b !errorlevel!
 )
 
-:: Build step
 echo Building project...
 cmake --build build --config Debug
 if !errorlevel! neq 0 (

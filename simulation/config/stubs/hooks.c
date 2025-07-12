@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <windows.h>
 #include "FreeRTOS.h"
 #include "task.h"
 #include "fake_assert.h"
@@ -52,21 +53,22 @@ void vConfigureTimerForRunTimeStats(void)
 
 void portRECORD_READY_PRIORITY(UBaseType_t uxPriority, UBaseType_t uxReadyPriorities)
 {
-    // Dummy implementation
+
 }
 
 void portRESET_READY_PRIORITY(UBaseType_t uxPriority, UBaseType_t uxReadyPriorities)
 {
-    // Dummy implementation
+
 }
 
 UBaseType_t portGET_HIGHEST_PRIORITY(UBaseType_t uxTopPriority, UBaseType_t uxReadyPriorities)
 {
-    return 0; // Dummy implementation
+    return 0;
 }
 
-void vApplicationIdleHook(void) {
-    printf("Idle hook\n");
+void vApplicationIdleHook(void) 
+{
+    Sleep(1);
 }
 
 void vApplicationTickHook(void) {}

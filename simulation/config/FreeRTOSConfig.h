@@ -4,12 +4,13 @@
 /* Essential configuration */
 #define configUSE_16_BIT_TICKS          0
 #define configUSE_PREEMPTION            1
+#define configUSE_TIME_SLICING          1
 #define configTICK_RATE_HZ              ( ( TickType_t ) 1000 )
 #define configMAX_PRIORITIES            5
-#define configTOTAL_HEAP_SIZE           ((size_t)(2048 * 1024)) //2mb
+#define configTOTAL_HEAP_SIZE           ((size_t)(4096 * 1024)) //4mb
 #define configMAX_TASK_NAME_LEN         16
-#define configMINIMAL_STACK_SIZE        ( ( uint16_t ) 4096 )
-#define configTIMER_TASK_STACK_DEPTH    2048
+#define configMINIMAL_STACK_SIZE        256 
+#define configTIMER_TASK_STACK_DEPTH    4096
 #define configCPU_CLOCK_HZ              ( ( unsigned long ) 100000000 )
 #define configBYTE_ALIGNMENT            8
 
@@ -22,11 +23,11 @@
 #define configUSE_APPLICATION_TASK_TAG  0
 #define configENABLE_BACKWARD_COMPATIBILITY 0
 #define configUSE_TASK_NOTIFICATIONS    1
-#define configUSE_TIMERS                1
+#define configUSE_TIMERS                0
 #define configIDLE_SHOULD_YIELD         1
 #define configTIMER_TASK_PRIORITY       ( configMAX_PRIORITIES - 1 )
 #define configTIMER_QUEUE_LENGTH        10
-#define configAPPLICATION_ALLOCATED_HEAP 1
+#define configAPPLICATION_ALLOCATED_HEAP 0
 #define configUSE_MUTEXES 1
 #define configUSE_COUNTING_SEMAPHORES 1
 #define configUSE_QUEUE_SETS 1
@@ -42,15 +43,15 @@
 #define configPRINTF( x )               printf x
 
 /* Error checking */
-#include "fake_assert.h"
-#define configASSERT( x )               if( ( x ) == 0 ) vFakeAssert( false, __FILE__, __LINE__ )
+extern void vAssertCalled( const char * const pcFileName, unsigned long ulLine );
+#define configASSERT( x )     if( ( x ) == 0 ) vAssertCalled( __FILE__, __LINE__ )
 
 /* Hooks */
-#define configCHECK_FOR_STACK_OVERFLOW  1
+#define configCHECK_FOR_STACK_OVERFLOW  0
 #define configUSE_MALLOC_FAILED_HOOK    1
 
 /* Kernel features */
-#define configUSE_IDLE_HOOK             0
+#define configUSE_IDLE_HOOK             1
 #define configUSE_TICK_HOOK             0
 #define configUSE_DAEMON_TASK_STARTUP_HOOK 0
 
