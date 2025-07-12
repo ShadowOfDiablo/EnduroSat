@@ -17,20 +17,40 @@
 SemaphoreHandle_t xQueueMutex;
 SemaphoreHandle_t xConsoleMutex;
 struct device device2;
+volatile BaseType_t slaveResetRequested = pdFALSE;
 
-void vAssertCalled(const char * const pcFileName, unsigned long ulLine)
-{
+const char* slaveStateToString(SlaveState state) {
+    switch (state) {
+        case SLAVE_SLEEP: return "SLEEP";
+        case SLAVE_ACTIVE: return "ACTIVE";
+        case SLAVE_FAULT: return "FAULT";
+        default: return "UNKNOWN";
+    }
+}
+
+const char* masterStateToString(MasterState state) {
+    switch (state) {
+        case MASTER_IDLE: return "IDLE";
+        case MASTER_PROCESSING: return "PROCESSING";
+        case MASTER_ERROR: return "ERROR";
+        default: return "UNKNOWN";
+    }
+}
+
+void vAssertCalled(const char * const pcFileName, unsigned long ulLine) {
     printf("ASSERT! Line %lu of file %s\n", ulLine, pcFileName);
     taskDISABLE_INTERRUPTS();
     for (;;);
 }
 
-int main(void)
-{
+int main(void) {
     printf("Starting FreeRTOS Windows port...\n");
 
     xQueueMutex = xSemaphoreCreateMutex();
     xConsoleMutex = xSemaphoreCreateMutex();
+
+    device2.id = 0xB;
+    device2.currentState = SLAVE_SLEEP;
 
     device1_init();
     device2_init();

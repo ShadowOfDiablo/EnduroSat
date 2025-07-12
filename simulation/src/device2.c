@@ -7,16 +7,11 @@
 #include "semphr.h"
 #include <windows.h>
 
-extern SemaphoreHandle_t xQueueMutex;
-extern SemaphoreHandle_t xConsoleMutex;
-extern struct device device2;
 TaskHandle_t xSlaveTaskHandle = NULL;
-volatile BaseType_t slaveResetRequested = pdFALSE;
 
 void internal_slave_task(void *pvParameters);
 
-void device2_init(void)
-{
+void device2_init(void) {
     printf("Creating Slave task (Device 2)...\n");
     BaseType_t status = xTaskCreate(internal_slave_task, "Slave", 1024, NULL, configMAX_PRIORITIES - 1, &xSlaveTaskHandle);
     if (status != pdPASS) {
@@ -26,23 +21,21 @@ void device2_init(void)
     }
 }
 
-void internal_slave_task(void *pvParameters)
-{
+void internal_slave_task(void *pvParameters) {
     (void) pvParameters;
     srand((unsigned int)GetTickCount());
 
-    for (;;)
-    {
-        Sleep(1000); // 1000 ms
+    for (;;) {
+        Sleep(1000);
 
         if (slaveResetRequested == pdTRUE) {
-            slaveResetRequested = pdFALSE;
+            slaveResetRequested = pdFALSE; 
             if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
                 device2.currentState = SLAVE_ACTIVE;
                 xSemaphoreGive(xQueueMutex);
             }
             if (xSemaphoreTake(xConsoleMutex, portMAX_DELAY) == pdTRUE) {
-                printf("[Slave]DeviceB: Reset request received. State is now ACTIVE.\n");
+                printf("[Slave]DeviceB Reset request processed. State is now %s.\n", slaveStateToString(SLAVE_ACTIVE));
                 xSemaphoreGive(xConsoleMutex);
             }
             continue;
@@ -62,7 +55,7 @@ void internal_slave_task(void *pvParameters)
                 xSemaphoreGive(xQueueMutex);
             }
             if (xSemaphoreTake(xConsoleMutex, portMAX_DELAY) == pdTRUE) {
-                printf("[Slave]DeviceB State changed to: %d\n", newState);
+                printf("[Slave]DeviceB State changed to: %s\n", slaveStateToString(newState));
                 xSemaphoreGive(xConsoleMutex);
             }
         }

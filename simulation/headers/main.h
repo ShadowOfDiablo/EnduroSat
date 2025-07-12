@@ -4,7 +4,10 @@
 #include "FreeRTOS.h"
 #include "task.h" 
 #include "semphr.h"
+#include "device1.h"
 #include "device2.h" 
+
+#define FAULT_RESET_THRESHOLD 3
 
 struct device {
     unsigned int id;
@@ -16,5 +19,8 @@ extern SemaphoreHandle_t xQueueMutex;
 extern SemaphoreHandle_t xConsoleMutex;
 extern struct device device2;
 extern volatile BaseType_t slaveResetRequested;
+
+const char* slaveStateToString(SlaveState state);
+const char* masterStateToString(MasterState state);
 
 #endif /* MAIN_H */
