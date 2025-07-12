@@ -5,73 +5,69 @@
 #include "main.h"
 #include <stdio.h>
 #include "semphr.h"
+#include <windows.h>
 
 extern SemaphoreHandle_t xQueueMutex;
 extern SemaphoreHandle_t xConsoleMutex;
 extern struct device device2;
+extern volatile BaseType_t slaveResetRequested;
 
 void internal_master_task(void *pvParameters);
 
 void device1_init(void)
 {
-    printf("Creating Master task (Device 1)...\n");
-    BaseType_t status = xTaskCreate(
-        internal_master_task,
-        "Master",
-        1024, NULL,
-        configMAX_PRIORITIES - 2,
-        NULL);
-
+    printf("Creating [Master]DeviceA task (Device 1)...\n");
+    BaseType_t status = xTaskCreate(internal_master_task, "Master", 1024, NULL, configMAX_PRIORITIES - 2, NULL);
     if (status != pdPASS) {
-        printf("ERROR: Failed to create Master task! (%d)\n", status);
+        printf("ERROR: Failed to create [Master]DeviceA task! (%d)\n", status);
     } else {
-        printf("Master task created\n");
+        printf("[Master]DeviceA task created\n");
     }
 }
 
 void internal_master_task(void *pvParameters)
 {
     (void)pvParameters;
-    printf("[Master] Running...\n");
-
     MasterState myState = MASTER_IDLE;
     int faultCounter = 0;
 
     for (;;)
     {
-        vTaskDelay(pdMS_TO_TICKS(1000));
+        Sleep(500); // 500 ms
 
-        SlaveState slaveState;
-
+        SlaveState currentSlaveState;
         if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
-            slaveState = device2.currentState;
+            currentSlaveState = device2.currentState;
             xSemaphoreGive(xQueueMutex);
         }
 
-        switch (slaveState) {
+        switch (currentSlaveState) {
             case SLAVE_ACTIVE:
                 myState = MASTER_PROCESSING;
+                faultCounter = 0;
                 break;
             case SLAVE_FAULT:
                 myState = MASTER_ERROR;
                 faultCounter++;
-                if (faultCounter >= 3) {
-                    printf("[Master] 3 FAULTS detected, resetting Slave.\n");
-                    if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
-                        device2.currentState = SLAVE_SLEEP;
-                        xSemaphoreGive(xQueueMutex);
-                    }
-                    faultCounter = 0;
-                }
                 break;
-            case SLAVE_SLEEP:
-                if (myState == MASTER_ERROR) {
-                    myState = MASTER_IDLE;
-                }
+            default:
+                myState = MASTER_IDLE;
                 break;
         }
+        
+        if (xSemaphoreTake(xConsoleMutex, portMAX_DELAY) == pdTRUE) {
+            printf("[Master]DeviceA: My State: %d | Slave is: %d\n", myState, currentSlaveState);
+            xSemaphoreGive(xConsoleMutex);
+        }
 
-        printf("[Master] Tick: %lu | My State: %d | Slave: %d | Faults: %d\n",
-               xTaskGetTickCount(), myState, slaveState, faultCounter);
+        if (faultCounter >= 3) 
+        {
+            if (xSemaphoreTake(xConsoleMutex, portMAX_DELAY) == pdTRUE) {
+                printf("[Master]DeviceA: DETECTED 3 FAULTS! Requesting Slave reset...\n");
+                xSemaphoreGive(xConsoleMutex);
+            }
+            slaveResetRequested = pdTRUE;
+            faultCounter = 0;
+        }
     }
 }
