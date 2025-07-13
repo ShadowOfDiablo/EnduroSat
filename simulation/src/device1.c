@@ -4,10 +4,20 @@
 #include "device2.h"
 #include "main.h"
 #include <stdio.h>
+#include <stdbool.h>
 #include "semphr.h"
-#include <windows.h>
+#if defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+#else
+    #include <unistd.h>
+    #define Sleep(ms) usleep((ms) * 1000)
+#endif
 
-boolean bDevice1Turn = FALSE;
+#if defined(_WIN32) || defined(_WIN64)
+    boolean bDevice1Turn = FALSE;
+#else
+    bool bDevice1Turn = pdFALSE;
+#endif
 extern TaskHandle_t pSlaveTaskHandle;
 void l_internalMasterTask(void *pParameters);
 void gl_resetDevice2(TaskHandle_t pTaskHandle);
@@ -28,7 +38,7 @@ void l_internalMasterTask(void *pParameters) {
     int faultCounter = 0;
 
     SlaveState lastKnownSlaveState = SLAVE_SLEEP;
-    while (TRUE) {
+    while (pdTRUE) {
         Sleep(500);
 
         SlaveState currentSlaveState;
@@ -63,7 +73,7 @@ void l_internalMasterTask(void *pParameters) {
         {
             faultCounter = 0;
         } else {
-            if(currentSlaveState == SLAVE_FAULT && bDevice1Turn != TRUE)
+            if(currentSlaveState == SLAVE_FAULT && bDevice1Turn != pdTRUE)
             {
                 faultCounter++;
             }
@@ -94,9 +104,17 @@ void l_internalMasterTask(void *pParameters) {
             }
 
             faultCounter = 0;
-            bDevice1Turn = TRUE;
+            #if defined(_WIN32) || defined(_WIN64)
+                bDevice1Turn = TRUE;
+            #else
+                bDevice1Turn = pdTRUE;
+            #endif
         }
-        bDevice1Turn = TRUE;
+        #if defined(_WIN32) || defined(_WIN64)
+                bDevice1Turn = TRUE;
+            #else
+                bDevice1Turn = pdTRUE;
+            #endif
         Sleep(100);
     }
 }

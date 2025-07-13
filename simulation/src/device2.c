@@ -5,10 +5,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "semphr.h"
-#include <windows.h>
+#if defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+    extern boolean bDevice1Turn;
+#else
+    #include <unistd.h>
+    #include <stdbool.h>
+    #define Sleep(ms) usleep((ms) * 1000)
+    extern bool bDevice1Turn;
+#endif
 
 TaskHandle_t pSlaveTaskHandle = NULL;
-extern boolean bDevice1Turn;
 BaseType_t firstRun;
 
 void l_internalSlaveTask(void *pParameters);
@@ -26,10 +33,14 @@ void gl_device2Init(void) {
 
 void l_internalSlaveTask(void *pParameters) {
     (void)pParameters;
-    srand((unsigned int)GetTickCount());
-    while (TRUE)
+    #if defined(_WIN32) || defined(_WIN64)
+        srand((unsigned int)GetTickCount());
+    #else
+        srand((unsigned int)xTaskGetTickCount());
+    #endif
+    while (pdTRUE)
     {
-        if (firstRun == TRUE && bDevice1Turn == TRUE)
+        if (firstRun == pdTRUE && bDevice1Turn == pdTRUE)
         {
             if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
                 sDevice2.currentState = SLAVE_ACTIVE;
@@ -74,8 +85,8 @@ void l_internalSlaveTask(void *pParameters) {
             }
         }
 
-        if (bDevice1Turn == TRUE) {
-            bDevice1Turn = FALSE;
+        if (bDevice1Turn == pdTRUE) {
+            bDevice1Turn = pdFALSE;
         }
         firstRun = pdFALSE;
         Sleep(1000);
