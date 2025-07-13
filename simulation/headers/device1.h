@@ -7,6 +7,6 @@ typedef enum {
     MASTER_ERROR
 } MasterState;
 
-void device1_init(void);
+void gl_device1Init(void);
 
 #endif // DEVICE1_H

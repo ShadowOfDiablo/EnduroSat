@@ -7,16 +7,16 @@
 #include "semphr.h"
 #include <windows.h>
 
-TaskHandle_t xSlaveTaskHandle = NULL;
-extern boolean device1Turn;
+TaskHandle_t pSlaveTaskHandle = NULL;
+extern boolean bDevice1Turn;
 BaseType_t firstRun;
 
-void internal_slave_task(void *pvParameters);
+void l_internalSlaveTask(void *pParameters);
 
-void device2_init(void) {
+void gl_device2Init(void) {
     firstRun = pdTRUE;
     printf("Creating Slave task (Device 2)...\n");
-    BaseType_t status = xTaskCreate(internal_slave_task, "Slave", 1024, NULL, configMAX_PRIORITIES - 1, &xSlaveTaskHandle);
+    BaseType_t status = xTaskCreate(l_internalSlaveTask, "Slave", 1024, NULL, configMAX_PRIORITIES - 1, &pSlaveTaskHandle);
     if (status != pdPASS) {
         printf("ERROR: Failed to create Slave task! (%d)\n", status);
     } else {
@@ -24,15 +24,15 @@ void device2_init(void) {
     }
 }
 
-void internal_slave_task(void *pvParameters) {
-    (void) pvParameters;
+void l_internalSlaveTask(void *pParameters) {
+    (void)pParameters;
     srand((unsigned int)GetTickCount());
     while (TRUE)
     {
-        if (firstRun == TRUE && device1Turn == TRUE)
+        if (firstRun == TRUE && bDevice1Turn == TRUE)
         {
             if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
-                device2.currentState = SLAVE_ACTIVE;
+                sDevice2.currentState = SLAVE_ACTIVE;
                 xSemaphoreGive(xQueueMutex);
             }
             if (xSemaphoreTake(xConsoleMutex, portMAX_DELAY) == pdTRUE) {
@@ -43,33 +43,30 @@ void internal_slave_task(void *pvParameters) {
         }
         SlaveState currentState;
         if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
-            currentState = device2.currentState;
+            currentState = sDevice2.currentState;
             xSemaphoreGive(xQueueMutex);
         }
-        SlaveState newState = (rand()%3); //= (rand() % 5 == 0) ? SLAVE_FAULT : SLAVE_ACTIVE;
+        SlaveState newState = (rand() % 3);
         switch(newState)
         {
-        case 0:
-            newState = SLAVE_FAULT;
-        break;
-
-        case 1:
-            newState = SLAVE_FAULT;
-        break;
-
-        case 2:
-            newState = SLAVE_FAULT;
-        break;
-
-        default:
-            newState = SLAVE_FAULT;
-        break;
+            case 0:
+                newState = SLAVE_FAULT;
+                break;
+            case 1:
+                newState = SLAVE_ACTIVE;
+                break;
+            case 2:
+                newState = SLAVE_SLEEP;
+                break;
+            default:
+                newState = SLAVE_FAULT;
+                break;
         }
-        printf("[Slave]DeviceB State changed to: %s\n", slaveStateToString(newState));
+        printf("[Slave]DeviceB State changed to: %s\n", gl_slaveStateToString(newState));
         if(currentState != newState)
         {
             if (xSemaphoreTake(xQueueMutex, portMAX_DELAY) == pdTRUE) {
-                device2.currentState = newState;
+                sDevice2.currentState = newState;
                 xSemaphoreGive(xQueueMutex);
             }
             if (xSemaphoreTake(xConsoleMutex, portMAX_DELAY) == pdTRUE) {
@@ -77,8 +74,8 @@ void internal_slave_task(void *pvParameters) {
             }
         }
 
-        if (device1Turn == TRUE) {
-            device1Turn = FALSE;
+        if (bDevice1Turn == TRUE) {
+            bDevice1Turn = FALSE;
         }
         firstRun = pdFALSE;
         Sleep(1000);

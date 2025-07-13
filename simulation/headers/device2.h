@@ -7,6 +7,6 @@ typedef enum {
     SLAVE_FAULT
 } SlaveState;
 
-void device2_init(void);
+void gl_device2Init(void);
 
 #endif // DEVICE2_H

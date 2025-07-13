@@ -26,10 +26,9 @@
 
 #ifndef FAKE_ASSERT_H
 #define FAKE_ASSERT_H
+
 #include <stdbool.h>
 
-void vFakeAssert( bool x,
-                  char * file,
-                  int line );
+void gl_fakeAssert(bool bCondition, char *cpFile, int line);
 
 #endif /* FAKE_ASSERT_H */

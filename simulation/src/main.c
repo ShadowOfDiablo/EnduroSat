@@ -16,10 +16,10 @@
 
 SemaphoreHandle_t xQueueMutex;
 SemaphoreHandle_t xConsoleMutex;
-struct device device2;
+struct device sDevice2;
 volatile BaseType_t slaveResetRequested = pdFALSE;
 
-const char* slaveStateToString(SlaveState state) {
+const char* gl_slaveStateToString(SlaveState state) {
     switch (state) {
         case SLAVE_SLEEP: return "SLEEP";
         case SLAVE_ACTIVE: return "ACTIVE";
@@ -28,7 +28,7 @@ const char* slaveStateToString(SlaveState state) {
     }
 }
 
-const char* masterStateToString(MasterState state) {
+const char* gl_masterStateToString(MasterState state) {
     switch (state) {
         case MASTER_IDLE: return "IDLE";
         case MASTER_PROCESSING: return "PROCESSING";
@@ -37,8 +37,8 @@ const char* masterStateToString(MasterState state) {
     }
 }
 
-void vAssertCalled(const char * const pcFileName, unsigned long ulLine) {
-    printf("ASSERT! Line %lu of file %s\n", ulLine, pcFileName);
+void vAssertCalled(const char * const cpFileName, unsigned long ulLine) {
+    printf("ASSERT! Line %lu of file %s\n", ulLine, cpFileName);
     taskDISABLE_INTERRUPTS();
     for (;;);
 }
@@ -49,15 +49,15 @@ int main(void) {
     xQueueMutex = xSemaphoreCreateMutex();
     xConsoleMutex = xSemaphoreCreateMutex();
 
-    device2.id = 0xB;
-    device2.currentState = SLAVE_SLEEP;
+    sDevice2.id = 0xB;
+    sDevice2.currentState = SLAVE_SLEEP;
 
-    device1_init();
-    device2_init();
+    gl_device1Init();
+    gl_device2Init();
 
     printf("Free heap before scheduler: %lu bytes\n", xPortGetFreeHeapSize());
 
     vTaskStartScheduler();
-    
+
     return 0;
 }
