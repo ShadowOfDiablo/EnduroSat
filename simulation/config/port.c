@@ -1,9 +1,20 @@
 #include "FreeRTOS.h"
 #include "task.h"
 
-#include <windows.h>
+#if defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+#else
+    #include <unistd.h>
+    #define Sleep(ms) usleep((ms) * 1000)
+#endif
 #include <stdio.h>
-#include <process.h>
+#ifdef _WIN32
+    #include <process.h>
+    // Windows-specific thread creation or process control functions
+#else
+    #include <pthread.h> // For threading on Linux
+    // Linux/POSIX equivalent thread creation or process control functions
+#endif
 #define MAX_TASKS 8  
 
 typedef struct {

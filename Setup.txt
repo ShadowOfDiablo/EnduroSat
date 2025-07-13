@@ -1,7 +1,12 @@
-Prerequisites:
-C/C++ (Microsoft)
+Before you start setting up everything, I suggest either use linux or MINGW
 
-CMake Tools (Microsoft)
+I have prepared a shell script to copy everything that's needed, delete 
+what you don't need and to get you up and going
+
+
+Prerequisites:
+C/C++ and MinGW (Microsoft) - Windows
+CMake Tools (Microsoft) - Windows/Linux
 
 /-------------------MinGW-----------------/
 Install MinGW:https://sourceforge.net/projects/mingw/files/latest/download
@@ -36,6 +41,10 @@ Restart VSCode
 Check if everything is installed correctly with: 
 cmake --version
 
+
+Linux(Debian based):
+sudo apt install cmake
+
 /--------------------------------------------/
 
 
@@ -44,8 +53,21 @@ cmake --version
 Step 1:
 git clone https://github.com/FreeRTOS/FreeRTOS.git
 
-Step 2:
-msbuild FreeRTOS.sln /p:Configuration=Debug
+The root folder should look as it follows:
+- documents
+- freeRTOS_OS(Name it like this, otherwise the scrips won't work well)
+- simulation
+- folder_setup.sh
+- Setup.txt
 
-problem 1 (will add the pic later) - go to -> C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\MSBuild\Current\Bin
+And this is the correct path freeRTOS_OS/FreeRTOS/FreeRTOS , freeRTOS_OS/FreeRTOS/FreeRTOS-Plus
+
+
+Step 2:
+(freeRTOS_OS/FreeRTOS/FreeRTOS)
+go to Source and git clone https://github.com/FreeRTOS/FreeRTOS-Kernel.git
+move all of the files from the "FreeRTOS-Kernel" to the folder above "Source".
+
+It shouldn't be Source/FreeRTOS-Kernel/ . It should just be Source/ (files from FreeRTOS-Kernel without the extra folder) 
+/----------------------FreeRTOS Set Up---------------------------/
 

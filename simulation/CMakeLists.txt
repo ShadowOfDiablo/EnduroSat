@@ -29,7 +29,5 @@ add_executable(device_system
     src/main.c
     src/device1.c
     src/device2.c
-
-    
     ${FREERTOS_SOURCES}
 )

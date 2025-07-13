@@ -1,6 +1,11 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
+#if defined(_WIN32) || defined(_WIN64)
+    #include <windows.h>
+#else
+    #include <unistd.h>
+    #define Sleep(ms) usleep((ms) * 1000)
+#endif
 #include "FreeRTOS.h"
 #include "task.h"
 #include "fake_assert.h"
