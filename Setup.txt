@@ -56,6 +56,8 @@ sudo apt install cmake
 
 /----------------------FreeRTOS Set Up---------------------------/
 Step 1:
+(Assuming that you are in the root folder outside of simulation) 
+mkdir freeRTOS_OS
 git clone https://github.com/FreeRTOS/FreeRTOS.git
 
 The root folder should look as it follows:
