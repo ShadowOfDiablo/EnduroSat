@@ -1,4 +1,4 @@
-# enduroSat
+# EnduroSat
 task
 
 Use the "folder_setup.sh" script for setting up everything you need.
